@@ -1,33 +1,34 @@
 classdef GCStation
     properties
-        received_ids
-        collision_count
-        total_drones
-        idle_slot_count
+        received_drones
     end
 
     methods
-        function gcstation = GCStation(total_drones)
-            gcstation.received_ids = [];
-            gcstation.collision_count = 0;
-            gcstation.total_drones = total_drones; 
-            gcstation.idle_slot_count = 0;
-        end   
+        function gcStation = GCStation()
+            gcStation.received_drones = {};
+        end
 
-        function gcstation = receive_ids(gcstation, transmitting_drones)
-            num_transmitting = sum(transmitting_drones);  
-            if num_transmitting == 0
-                gcstation.idle_slot_count = gcstation.idle_slot_count + 1;
-            elseif num_transmitting == 1
-                transmitted_drone = find(transmitting_drones == 1);  
-                gcstation.received_ids = [gcstation.received_ids, transmitted_drone];
-            else
-                gcstation.collision_count = gcstation.collision_count + 1;
+        function gcStation = send_acks(gcStation)
+            for drone = gcStation.received_drones
+                if drone.state == 1
+                    drone.receive_ack();
+                end
             end
         end
 
-        function all_identified = check_all_identified(gcstation)
-            all_identified = length(gcstation.received_ids) == gcstation.total_drones;  
+        function gcStation = receive_incoming_data(gcStation, transmitting_drones)
+            number_drones_attempting_to_transmit = length(transmitting_drones);
+            if number_drones_attempting_to_transmit == 0
+                disp('Idle slot detected.');
+            elseif number_drones_attempting_to_transmit > 1
+                disp('Collision detected.');
+            elseif number_drones_attempting_to_transmit == 1
+                drone = transmitting_drones(1);
+                gcStation.received_drones = [gcStation.received_drones, drone];
+                disp(['ID packet successfully received from Drone ', num2str(drone.ID), '.']);
+            end
         end
     end
 end
+
+
