@@ -1,7 +1,6 @@
 classdef Drone
     properties
         ID
-        coordinates
         transmit_probability
         state % 0 = idle, 1 = transmitted and waiting for ACK, 2 = success
         data_rate
@@ -10,97 +9,32 @@ classdef Drone
 
     methods
         % Constructor
-        function drone = Drone(ID, coordinates, transmit_probability, data_rate, packet_size)
+        function drone = Drone(ID)
             drone.ID = ID;
-            drone.coordinates = coordinates;
-            drone.transmit_probability = transmit_probability;
             drone.state = 0; % idle to start
-            drone.data_rate = data_rate;
-            drone.packet_size = packet_size;
+            drone.data_rate = 10000; % bps
+            drone.packet_size = 1000; % bits
+            drone.transmit_probability = 0 ; % unknown at this stage
         end
 
         function drone = decide_to_transmit(drone)
-            if ~(drone.state == 1) % only send if ack has not been received
-                if rand() < drone.transmit_probability
-                    drone.send_data()
-                end
+           % if ~(drone.state == 2) % do not send if received ACK
+           % random_prob = rand(); % generate random probability between 0-1
+           % disp(drone.transmit_probability);
+           %     if random_prob < drone.transmit_probability
+            %        drone = drone.send_data();
+            %    end
             end
         end
 
         function drone = send_data(drone)
-            drone.state 
-            pause(drone.data_rate / drone.packet_size) % simulate transmission time
+            drone.state = 1;
+            %pause(drone.data_rate / drone.packet_size) % simulate transmission time
         end
 
         function drone = receive_ack(drone)
-            drone.state = 1;
+            drone.state = 2;
             disp(['Drone ', num2str(drone.ID), ' has received ACK.']);
         end
     end
 end
-
-%% TODOs:
-%% 1- add attempts + backoff strategy when max attempts is reached
-
-
-
-% classdef Drone
-%     properties
-%         id
-%         data_rate
-%         packet_size
-%         transmit_probability
-%         has_successfully_transmitted
-%         has_transmitted_in_this_slot
-%         attempts
-%         transmission_start_time  
-%         transmission_end_time    
-%     end
-% 
-%     methods
-%         function drone = Drone(id, transmit_probability)
-%             drone.id = id;
-%             drone.transmit_probability = transmit_probability;
-%             drone.has_successfully_transmitted = false;
-%             drone.attempts = 0;
-%             drone.data_rate = 10000; % bps
-%             drone.packet_size = 1000; % bits
-%             drone.transmission_start_time = NaN;  
-%             drone.transmission_end_time = NaN;   
-%         end
-% 
-%         function drone = transmit_or_not(drone)
-%             if ~drone.has_successfully_transmitted
-%                 if rand() < drone.transmit_probability
-%                     drone = drone.send_id_data(); 
-%                 end
-%             end
-%         end
-% 
-%         function drone = send_id_data(drone)
-%             drone.transmission_start_time = datetime('now');
-%             drone.has_transmitted_in_this_slot = true;
-%             drone.attempts = drone.attempts + 1;
-%             pause(drone.get_transmission_time()); % here we are just simulating how long it would take for the packet to send
-%             drone.transmission_end_time = datetime('now');  
-%         end
-% 
-%         function transmission_time = get_transmission_time(drone)
-%             % Transmission time = packet size / data rate (in seconds)
-%             transmission_time = drone.packet_size / drone.data_rate; 
-%         end
-% 
-%         function drone = receive_acknowledgment(drone)
-%             drone.has_successfully_transmitted = true;  
-%             disp(['Drone ', num2str(drone.id), ' received acknowledgment.']);
-%         end
-% 
-%         function duration = get_transmission_duration(drone)
-%             if ~isnan(drone.transmission_start_time) && ~isnan(drone.transmission_end_time)
-%                 duration = seconds(drone.transmission_end_time - drone.transmission_start_time);
-%             else
-%                 duration = NaN;  
-%             end
-%         end
-%     end
-% end

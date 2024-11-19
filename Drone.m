@@ -9,20 +9,25 @@ classdef Drone
 
     methods
         % Constructor
-        function drone = Drone(ID, transmit_probability)
+        function drone = Drone(ID)
             drone.ID = ID;
-            drone.transmit_probability = transmit_probability;
             drone.state = 0; % idle to start
             drone.data_rate = 10000; % bps
             drone.packet_size = 1000; % bits
+            drone.transmit_probability = 0 ; % unknown at this stage
+        end
+
+        function drone = set_transmit_probability(drone, probability)
+            drone.transmit_probability = probability;
         end
 
         function drone = decide_to_transmit(drone)
-            if ~(drone.state == 1) % only send if ack has not been received
-                if rand() < drone.transmit_probability
-                    drone = drone.send_data();
-                end
-            end
+           if (drone.state == 0) % only send if you aren't waiting for an acknowledgement
+            random_prob = rand(); % generate random probability between 0-1
+                if random_prob < drone.transmit_probability
+                   drone = drone.send_data();
+               end
+           end
         end
 
         function drone = send_data(drone)
