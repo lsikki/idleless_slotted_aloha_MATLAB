@@ -1,14 +1,15 @@
 
 % Here we are initializing all parameters
 drones = [Drone(1), Drone(2), Drone(3), Drone(4), Drone(5)];
-access_probabilities = [0.01, 0.03, 0.01, 0.05, 0.35];
+access_probabilities = 0.3 * rand() * ones(1, length(drones)); % all have the same transmission probability
 gcs = GCStation();
 slots_per_frame = 5;
-total_frames = 3;
+total_frames = 1;
 successful_drones = [];
+total_successful_transmissions = 0;
 
 % Now we will initiate a random access session 
-% Part of the beacon is the access probability for each drone
+% Part of the beacon is the access probability for each drone (the same for all)
 drones = gcs.send_beacon(drones, access_probabilities);
 
 for f = 1:total_frames
@@ -19,7 +20,7 @@ for f = 1:total_frames
     
         for i = 1:length(drones)
            drones(i) = drones(i).decide_to_transmit(); 
-          if drones(i).state == 1
+           if drones(i).state == 1
             transmitting_drones = [transmitting_drones, drones(i)]; 
            end
         end
@@ -29,11 +30,22 @@ for f = 1:total_frames
            disp(d.ID)
         end
 
+        % keeping track of successful cases to compute throughput later
+        if(length(transmitting_drones)==1)
+            total_successful_transmissions = total_successful_transmissions + 1;
+        end
+
         gcs = gcs.receive_incoming_data(transmitting_drones);
     end
     
     successful_drones = gcs.send_acks();
 end
+
+total_slots = total_frames * slots_per_frame;
+throughput = total_successful_transmissions / total_slots;
+disp('----------------------------------');
+disp('--------Session throughput--------');
+disp(num2str(throughput));
 
 %% TO DO:
 %% 1- add max number of attempts + backoff strategy

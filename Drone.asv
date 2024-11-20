@@ -17,14 +17,17 @@ classdef Drone
             drone.transmit_probability = 0 ; % unknown at this stage
         end
 
+        function drone = set_transmit_probability(drone, probability)
+            drone.transmit_probability = probability;
+        end
+
         function drone = decide_to_transmit(drone)
-           % if ~(drone.state == 2) % do not send if received ACK
-           % random_prob = rand(); % generate random probability between 0-1
-           % disp(drone.transmit_probability);
-           %     if random_prob < drone.transmit_probability
-            %        drone = drone.send_data();
-            %    end
-            end
+           if (drone.state == 0) % only send if you aren't waiting for an acknowledgement or if you hav
+            random_prob = rand(); % generate random probability between 0-1
+                if random_prob < drone.transmit_probability
+                   drone = drone.send_data();
+               end
+           end
         end
 
         function drone = send_data(drone)
