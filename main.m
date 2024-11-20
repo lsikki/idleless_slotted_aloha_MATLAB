@@ -29,10 +29,9 @@ grid on;
 
 %% TO DO:
 %% 1- add max number of attempts + backoff strategy
-%% 2- in idle slots, the ground station should send ACKS 
-%% 3- compute key statistics e.g., throughput and compare with regular slotted ALOHA
-%% 4- visualize simulation results
-%% 5- drones should wait for a certain period, if no ACK then state=0 and then retry
-
+%% 2- in idle slots, the ground station should send ACKS (best to make a new Idleless GCS class so that we can compare performance)
+%% 3- drones should wait for a certain period, if no ACK then state=0 and then retry
+%% 4- compare simulation results for regular slotted aloha and idleless version
 %% DONE:
 %% Beacon to initiate random access session
+%% Throughput vs Access Probability simulation for regular slotted ALOHA
