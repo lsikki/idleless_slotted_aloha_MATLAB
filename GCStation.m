@@ -1,11 +1,13 @@
 classdef GCStation
     properties
         received_drones
+        idleless
     end
 
     methods
-        function gcStation = GCStation()
+        function gcStation = GCStation(is_idleless)
             gcStation.received_drones = {}; 
+            gcStation.idleless = is_idleless; % 0 = regular slotted ALOHA, 1 = idleless slotted ALOHA
         end
 
         function updated_drones = send_beacon(gcStation, drones, access_probabilities)
@@ -34,6 +36,9 @@ classdef GCStation
             number_drones_attempting_to_transmit = length(transmitting_drones);
             if number_drones_attempting_to_transmit == 0
                 disp('Idle slot detected.');
+                if(gcStation.idleless == 1)
+                    gcStation.send_acks()
+                end
             elseif number_drones_attempting_to_transmit > 1
                 disp('Collision detected.');
             elseif number_drones_attempting_to_transmit == 1

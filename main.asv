@@ -1,0 +1,49 @@
+mean_throughputs = zeros(11);
+mean_idleless_throughputs = zeros(11);
+number_drones = zeros(11);
+
+for a=1:11
+    drones = [];
+    num_drones = 100 * rand;
+    number_drones(a)=num_drones;
+
+    for i=1:num_drones
+        drones = [drones, Drone(i)];
+    end
+
+    gcs = GCStation(0);
+    idleless_gcs = GCStation(1);
+    slots_per_frame = 5;
+    total_frames = 3;
+    number_sessions = 100;
+    
+    %% Slotted ALOHA
+    throughputs= zeros(number_sessions);
+    probabilities = zeros(number_sessions);
+    for i = 1:number_sessions
+        [throughput, probability] = IdlelessSlottedALOHA(gcs, drones, slots_per_frame, total_frames);
+        throughputs(i) = throughput;
+        probabilities(i) = probability;
+    end
+    
+    %% Idleless Slotted ALOHA
+    idleless_throughputs= zeros(number_sessions);
+    idleless_probabilities = zeros(number_sessions);
+    for i = 1:number_sessions
+        [throughput, probability] = IdlelessSlottedALOHA(idleless_gcs, drones, slots_per_frame, total_frames);
+        idleless_throughputs(i) = throughput;
+        idleless_probabilities(i) = probability;
+    end
+    mean_throughputs = mean(throughputs);
+    mean_idleless_throughputs
+end
+
+
+%% TO DO:
+%% 1- add max number of attempts + backoff strategy
+%% 3- drones should wait for a certain period, if no ACK then state=0 and then retry
+%% 4- compare simulation results for regular slotted aloha and idleless version
+%% DONE:
+%% Beacon to initiate random access session
+%% Throughput Simulation
+%% Idleless has been configured
