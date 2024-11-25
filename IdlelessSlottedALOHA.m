@@ -1,46 +1,47 @@
-
 function [throughput, access_probability] = IdlelessSlottedALOHA(gcs, drones, slots_per_frame, total_frames)
-    access_probabilities = 0.3 * rand() * ones(1, length(drones)); % all have the same transmission probability    
-    successful_drones = [];
-    total_successful_transmissions = 0;
+    throughput = 0;
+    total_transmissions = 0;
+    total_collisions = 0;
     
-    % Now we will initiate a random access session 
-    % Part of the beacon is the access probability for each drone (the same for all)
-    drones = gcs.send_beacon(drones, access_probabilities);
-    
-    for f = 1:total_frames
-        disp(['-----------FRAME: ', num2str(f), '-----------']);
-        for t = 1:slots_per_frame
-            disp(['---SLOT: ', num2str(t), '---']);
-            transmitting_drones = [];
-        
+    % Simulating over multiple frames
+    for frame = 1:total_frames
+        disp(['-----------FRAME: ', num2str(frame), '-----------']);
+        successful_transmissions = 0;
+        transmitting_drones = [];
+
+        % Simulating each slot within the frame
+        for slot = 1:slots_per_frame
+            disp(['---SLOT: ', num2str(slot), '---']);
+            
+            drones_in_slot = []; % Keep track of which drones are attempting to transmit
             for i = 1:length(drones)
-               drones(i) = drones(i).decide_to_transmit(); 
-               if drones(i).state == 1
-                transmitting_drones = [transmitting_drones, drones(i)]; 
-               end
+                drone = drones(i).decide_to_transmit();
+                if drone.state == 1
+                    drones_in_slot = [drones_in_slot, drone.ID];
+                    transmitting_drones = [transmitting_drones, drone];
+                end
             end
-    
-            disp('Drones attempting to transmit: ')
-            for d=transmitting_drones
-               disp(d.ID)
+            
+            % If no drones are attempting to transmit, ground station sends ACK
+            if isempty(drones_in_slot)
+                gcs = gcs.send_ACKs();
+            else
+                disp('Drones attempting to transmit:');
+                disp(drones_in_slot);
+                
+                % Handling transmission and collisions
+                if length(drones_in_slot) == 1
+                    successful_transmissions = successful_transmissions + 1;
+                else
+                    total_collisions = total_collisions + 1;
+                end
             end
-    
-            % keeping track of successful cases to compute throughput later
-            if(length(transmitting_drones)==1)
-                total_successful_transmissions = total_successful_transmissions + 1;
-            end
-    
-            gcs = gcs.receive_incoming_data(transmitting_drones);
         end
         
-        successful_drones = gcs.send_acks();
+        % Update throughput for this frame
+        total_transmissions = total_transmissions + successful_transmissions;
     end
     
-    total_slots = total_frames * slots_per_frame;
-    throughput = total_successful_transmissions / total_slots;
-    access_probability = access_probabilities(1); % all drones have the same ap for now
-
+    throughput = total_transmissions / (total_frames * slots_per_frame);
+    access_probability = mean([drones.access_probability]);
 end
-
-
