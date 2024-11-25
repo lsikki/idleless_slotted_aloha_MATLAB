@@ -8,19 +8,19 @@ classdef Drone
     methods
         function obj = Drone(ID)
             obj.ID = ID;
-            obj.state = 0; % Initially, no transmission
-            obj.access_probability = 0.3; % Default access probability
+            obj.state = 0;
+            obj.access_probability = 0.3; 
         end
         
         function obj = set_access_probability(obj, prob)
-            obj.access_probability = prob; % Dynamically set access probability
+            obj.access_probability = prob; 
         end
 
         function obj = decide_to_transmit(obj)
             if rand() < obj.access_probability
-                obj.state = 1; % Drone decides to transmit
+                obj.state = 1; 
             else
-                obj.state = 0; % Drone does not transmit
+                obj.state = 0;
             end
         end
     end
