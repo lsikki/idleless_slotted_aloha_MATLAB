@@ -24,7 +24,7 @@ classdef GCStation
             received = gcStation.received_drones;
             for i = 1:length(received)
                 if received{i}.state == 1  % Access drone using curly braces
-                    successful_drones = [successful_drones, received{i}.receive_ack()];  % Access drone using curly braces
+                    successful_drones = [successful_drones, received{i}.receive_ack()];  
                 end
             end
         end
@@ -37,10 +37,10 @@ classdef GCStation
             elseif number_drones_attempting_to_transmit > 1
                 disp('Collision detected.');
             elseif number_drones_attempting_to_transmit == 1
-                drone = transmitting_drones{1};  % Access drone using curly braces
+                drone = transmitting_drones{1}; 
                 existing_drone_ids = arrayfun(@(d) d.ID, gcStation.received_drones);  
                 if ~ismember(drone.ID, existing_drone_ids) 
-                    gcStation.received_drones = [gcStation.received_drones, drone];  % Add drone properly
+                    gcStation.received_drones = [gcStation.received_drones, drone];  
                 end
                 disp(['ID packet successfully received from Drone ', num2str(drone.ID), '.']);
             end
