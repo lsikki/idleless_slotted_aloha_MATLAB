@@ -10,7 +10,7 @@ for a = 1:11
     number_drones(a) = num_drones;
 
     for i = 1:num_drones
-        drones = [drones, Drone(i)];
+        drones = [drones, Drone(i, 15, 0)];
     end
 
     gcs = GCStation(0);
